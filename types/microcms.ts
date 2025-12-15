@@ -1,6 +1,6 @@
 /**
  * microCMS API response types
- * Based on schema: schema/api-blogs-20251206155310.json
+ * Based on schema: schema/api-blogs-20251215122119.json
  */
 
 export interface MicroCMSImage {
@@ -21,7 +21,7 @@ export interface MicroCMSBlog {
   title: string;
   content: string; // HTML from richEditorV2
   eyecatch?: MicroCMSImage;
-  category?: MicroCMSCategory;
+  categories?: MicroCMSCategory[]; // Array of category references (relationList)
   publishedAt?: string; // ISO 8601 date string
   createdAt: string;
   updatedAt: string;

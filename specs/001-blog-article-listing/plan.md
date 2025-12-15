@@ -131,7 +131,7 @@ schema/
 **Key Decisions**:
 
 1. ✅ Use microCMS richEditorV2 (HTML) instead of Markdown - avoids schema migration
-2. ✅ Use single category per article (not tags) - matches existing schema
+2. ✅ Use multiple categories per article (relationList) - matches updated schema
 3. ✅ Client-side pagination with build-time data - instant transitions, no API calls
 4. ✅ shadcn/ui setup required - constitution mandated
 5. ✅ HTML parsing for TOC generation - compatible with richEditorV2

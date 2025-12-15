@@ -89,13 +89,19 @@ export default async function ArticleDetailPage({
 
         <h1 className='text-4xl md:text-5xl font-bold mb-4'>{article.title}</h1>
 
-        <div className='flex items-center gap-4 text-muted-foreground'>
+        <div className='flex items-center gap-4 text-muted-foreground flex-wrap'>
           <time dateTime={article.publishedAt}>
             {formatDate(article.publishedAt)}
           </time>
 
-          {article.categoryName && (
-            <Badge variant='secondary'>{article.categoryName}</Badge>
+          {article.categoryNames && article.categoryNames.length > 0 && (
+            <>
+              {article.categoryNames.map((categoryName) => (
+                <Badge key={categoryName} variant='secondary'>
+                  {categoryName}
+                </Badge>
+              ))}
+            </>
           )}
         </div>
       </header>
