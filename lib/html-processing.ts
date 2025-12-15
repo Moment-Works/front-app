@@ -27,9 +27,15 @@ export function slugify(text: string): string {
 export function injectHeadingAnchors(html: string): string {
   const root = parse(html);
   const headings = root.querySelectorAll('h1, h2, h3');
+  const idCounts = new Map<string, number>();
 
   headings.forEach((heading) => {
-    const id = slugify(heading.text);
+    const baseId = slugify(heading.text);
+    const count = idCounts.get(baseId) || 0;
+    idCounts.set(baseId, count + 1);
+
+    // Always append counter for consistency (1-based indexing)
+    const id = `${baseId}-${count + 1}`;
     heading.setAttribute('id', id);
   });
 
@@ -44,16 +50,10 @@ export function injectHeadingAnchors(html: string): string {
 export function extractTableOfContents(html: string): TableOfContents {
   const root = parse(html);
   const headings = root.querySelectorAll('h1, h2, h3');
-  const usedIds = new Set<string>();
 
-  const tocHeadings: TocHeading[] = headings.map((heading, index) => {
-    let id = heading.getAttribute('id') || slugify(heading.text);
-
-    // Ensure unique IDs by appending index if duplicate
-    if (usedIds.has(id)) {
-      id = `${id}-${index}`;
-    }
-    usedIds.add(id);
+  const tocHeadings: TocHeading[] = headings.map((heading) => {
+    // IDs should already be set by injectHeadingAnchors
+    const id = heading.getAttribute('id') || slugify(heading.text);
 
     return {
       id,
