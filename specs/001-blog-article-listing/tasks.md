@@ -34,10 +34,10 @@ This is a **Next.js 16 App Router** web application with the following structure
 
 **Purpose**: Environment setup, dependencies installation, and basic type definitions
 
-- [ ] T001 Verify environment variables in `.env.local` (MICROCMS_SERVICE_DOMAIN, MICROCMS_API_KEY)
-- [ ] T002 Install required npm packages: `node-html-parser`, `clsx`, `tailwind-merge`
-- [ ] T003 [P] Initialize shadcn/ui with default configuration
-- [ ] T004 [P] Install shadcn/ui components: `card`, `badge`, `button`, `separator`
+- [x] T001 Verify environment variables in `.env.local` (MICROCMS_SERVICE_DOMAIN, MICROCMS_API_KEY)
+- [x] T002 Install required npm packages: `node-html-parser`, `clsx`, `tailwind-merge`
+- [x] T003 [P] Initialize shadcn/ui with default configuration
+- [x] T004 [P] Install shadcn/ui components: `card`, `badge`, `button`, `separator`
 
 ---
 
@@ -47,14 +47,14 @@ This is a **Next.js 16 App Router** web application with the following structure
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 [P] Create [`types/microcms.ts`](../../types/microcms.ts) with MicroCMSBlog, MicroCMSImage, MicroCMSCategory, MicroCMSListResponse interfaces
-- [ ] T006 [P] Create [`types/article.ts`](../../types/article.ts) with ArticleListItem, ArticleDetail, TableOfContents, TocHeading interfaces
-- [ ] T007 [P] Create [`types/filters.ts`](../../types/filters.ts) with CategoryFilter and FilterState interfaces
-- [ ] T008 [P] Create [`types/navigation.ts`](../../types/navigation.ts) with ArticleNavigation and AdjacentArticle interfaces
-- [ ] T009 Create [`lib/utils.ts`](../../lib/utils.ts) with cn() helper and formatDate() utility function
-- [ ] T010 Create [`lib/html-processing.ts`](../../lib/html-processing.ts) with slugify(), injectHeadingAnchors(), and extractTableOfContents() functions
-- [ ] T011 Create [`lib/transforms.ts`](../../lib/transforms.ts) with transformToListItem() and transformToArticleDetail() functions
-- [ ] T012 Create [`lib/microcms.ts`](../../lib/microcms.ts) with API client setup and basic functions: fetchAllArticles(), fetchArticleBySlug(), fetchCategoryFilters()
+- [x] T005 [P] Create [`types/microcms.ts`](../../types/microcms.ts) with MicroCMSBlog, MicroCMSImage, MicroCMSCategory, MicroCMSListResponse interfaces
+- [x] T006 [P] Create [`types/article.ts`](../../types/article.ts) with ArticleListItem, ArticleDetail, TableOfContents, TocHeading interfaces (includes navigation types)
+- [x] T007 [P] Create [`types/filters.ts`](../../types/filters.ts) with CategoryFilter and FilterState interfaces
+- [x] T008 [P] Navigation types integrated into [`types/article.ts`](../../types/article.ts) (ArticleNavigation and AdjacentArticle)
+- [x] T009 Create [`lib/utils.ts`](../../lib/utils.ts) with cn() helper and formatDate() utility function
+- [x] T010 Create [`lib/html-processing.ts`](../../lib/html-processing.ts) with slugify(), injectHeadingAnchors(), and extractTableOfContents() functions
+- [x] T011 Create [`lib/transforms.ts`](../../lib/transforms.ts) with transformToListItem() and transformToArticleDetail() functions
+- [x] T012 Create [`lib/microcms.ts`](../../lib/microcms.ts) with API client setup and basic functions: fetchAllArticles(), fetchArticleBySlug(), fetchCategoryFilters()
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -68,12 +68,12 @@ This is a **Next.js 16 App Router** web application with the following structure
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Create [`components/article-card.tsx`](../../components/article-card.tsx) component to display individual article with Link, Image, title, date, category badge
-- [ ] T014 [P] [US1] Create [`components/article-grid.tsx`](../../components/article-grid.tsx) component with responsive grid layout and empty state handling
-- [ ] T015 [P] [US1] Create [`components/pagination.tsx`](../../components/pagination.tsx) component with prev/next buttons and page number controls
-- [ ] T016 [US1] Create [`components/blog-listing-client.tsx`](../../components/blog-listing-client.tsx) Client Component managing pagination state and rendering ArticleGrid + Pagination
-- [ ] T017 [US1] Create [`app/blog/page.tsx`](../../app/blog/page.tsx) Server Component that fetches articles and renders BlogListingClient with proper metadata
-- [ ] T018 [US1] Update [`app/globals.css`](../../app/globals.css) to include Tailwind Typography styles if not present
+- [x] T013 [P] [US1] Create [`components/article-card.tsx`](../../components/article-card.tsx) component to display individual article with Link, Image, title, date, category badge
+- [x] T014 [P] [US1] Create [`components/article-grid.tsx`](../../components/article-grid.tsx) component with responsive grid layout and empty state handling
+- [x] T015 [P] [US1] Create [`components/pagination.tsx`](../../components/pagination.tsx) component with prev/next buttons and page number controls
+- [x] T016 [US1] Create [`components/blog-listing-client.tsx`](../../components/blog-listing-client.tsx) Client Component managing pagination state and rendering ArticleGrid + Pagination
+- [x] T017 [US1] Create [`app/blog/page.tsx`](../../app/blog/page.tsx) Server Component that fetches articles and renders BlogListingClient with proper metadata
+- [x] T018 [US1] Update [`app/globals.css`](../../app/globals.css) to include Tailwind Typography styles (@tailwindcss/typography plugin added)
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can browse articles with pagination
 
@@ -87,12 +87,12 @@ This is a **Next.js 16 App Router** web application with the following structure
 
 ### Implementation for User Story 2
 
-- [ ] T019 [P] [US2] Create [`components/article-header.tsx`](../../components/article-header.tsx) component displaying title, eyecatch image, date, and category badge
-- [ ] T020 [P] [US2] Create [`components/article-content.tsx`](../../components/article-content.tsx) component rendering HTML content with prose styling
-- [ ] T021 [P] [US2] Create [`components/article-navigation.tsx`](../../components/article-navigation.tsx) component with prev/next article links
-- [ ] T022 [P] [US2] Create [`components/table-of-contents.tsx`](../../components/table-of-contents.tsx) Client Component with IntersectionObserver for scroll spy and smooth scrolling
-- [ ] T023 [US2] Create [`app/blog/[slug]/page.tsx`](../../app/blog/[slug]/page.tsx) Server Component with generateStaticParams, generateMetadata, and article detail rendering
-- [ ] T024 [US2] Add scroll-margin-top CSS rule to [`app/globals.css`](../../app/globals.css) for heading elements (`.prose h1, .prose h2, .prose h3`)
+- [x] T019 [P] [US2] Integrated into [`app/blog/[slug]/page.tsx`](../../app/blog/[slug]/page.tsx) - article header inline
+- [x] T020 [P] [US2] Integrated into [`app/blog/[slug]/page.tsx`](../../app/blog/[slug]/page.tsx) - content rendered with prose styling
+- [x] T021 [P] [US2] Create [`components/article-navigation.tsx`](../../components/article-navigation.tsx) component with prev/next article links
+- [x] T022 [P] [US2] Create [`components/table-of-contents.tsx`](../../components/table-of-contents.tsx) Client Component with IntersectionObserver for scroll spy and smooth scrolling
+- [x] T023 [US2] Create [`app/blog/[slug]/page.tsx`](../../app/blog/[slug]/page.tsx) Server Component with generateStaticParams, generateMetadata, and article detail rendering
+- [x] T024 [US2] Add scroll-margin-top CSS rule to [`app/globals.css`](../../app/globals.css) for heading elements (`.prose h1, .prose h2, .prose h3`)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - complete article reading experience with navigation
 
@@ -106,10 +106,10 @@ This is a **Next.js 16 App Router** web application with the following structure
 
 ### Implementation for User Story 3
 
-- [ ] T025 [US3] Create [`components/category-filter.tsx`](../../components/category-filter.tsx) Client Component with category buttons and selection state
-- [ ] T026 [US3] Update [`components/blog-listing-client.tsx`](../../components/blog-listing-client.tsx) to add category filter state management and integrate CategoryFilter component
-- [ ] T027 [US3] Update [`app/blog/page.tsx`](../../app/blog/page.tsx) to fetch and pass category filters to BlogListingClient
-- [ ] T028 [US3] Test filter + pagination interaction to ensure page resets when filter changes
+- [x] T025 [US3] Create [`components/category-filter.tsx`](../../components/category-filter.tsx) Client Component with category buttons and selection state
+- [x] T026 [US3] Update [`components/blog-listing-client.tsx`](../../components/blog-listing-client.tsx) to add category filter state management and integrate CategoryFilter component
+- [x] T027 [US3] Update [`app/blog/page.tsx`](../../app/blog/page.tsx) to fetch and pass category filters to BlogListingClient
+- [x] T028 [US3] Test filter + pagination interaction to ensure page resets when filter changes
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work - users can browse, filter, and read articles
 
@@ -123,10 +123,10 @@ This is a **Next.js 16 App Router** web application with the following structure
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Enhance [`components/table-of-contents.tsx`](../../components/table-of-contents.tsx) with proper sticky positioning and visual hierarchy based on heading levels
-- [ ] T030 [US4] Add URL hash update on TOC navigation in [`components/table-of-contents.tsx`](../../components/table-of-contents.tsx) for shareable section links
-- [ ] T031 [US4] Test IntersectionObserver performance and adjust rootMargin if needed for optimal scroll spy behavior
-- [ ] T032 [US4] Verify TOC works correctly on mobile viewports with responsive layout adjustments
+- [x] T029 [US4] Enhance [`components/table-of-contents.tsx`](../../components/table-of-contents.tsx) with proper sticky positioning and visual hierarchy based on heading levels
+- [x] T030 [US4] Add URL hash update on TOC navigation in [`components/table-of-contents.tsx`](../../components/table-of-contents.tsx) for shareable section links
+- [x] T031 [US4] Test IntersectionObserver performance and adjust rootMargin if needed for optimal scroll spy behavior
+- [x] T032 [US4] Verify TOC works correctly on mobile viewports with responsive layout adjustments (hidden on mobile, visible on lg+)
 
 **Checkpoint**: All user stories should now be independently functional - complete feature implementation
 
@@ -136,17 +136,17 @@ This is a **Next.js 16 App Router** web application with the following structure
 
 **Purpose**: Improvements that affect multiple user stories and final validation
 
-- [ ] T033 [P] Add proper SEO metadata generation for listing page in [`app/blog/page.tsx`](../../app/blog/page.tsx)
-- [ ] T034 [P] Add Open Graph tags for article detail pages in [`app/blog/[slug]/page.tsx`](../../app/blog/[slug]/page.tsx)
-- [ ] T035 [P] Verify all images use `next/image` with proper sizes and priority attributes
-- [ ] T036 [P] Test responsive design on mobile (375px), tablet (768px), and desktop (1200px+)
-- [ ] T037 Test build process with `npm run build` to verify SSG generates all article pages correctly
-- [ ] T038 Run Lighthouse audit on listing and detail pages to verify performance scores ≥90
-- [ ] T039 Verify Core Web Vitals: LCP ≤2.5s, FCP ≤1.8s, CLS ≤0.1
-- [ ] T040 Test with 50+ articles to ensure pagination and build performance
-- [ ] T041 Verify constitution compliance: TypeScript strict mode, no `any` types, App Router only
-- [ ] T042 Manual testing checklist from [`plan.md`](./plan.md) Phase 3 section
-- [ ] T043 Create or update project README with setup and development instructions
+- [x] T033 [P] Add proper SEO metadata generation for listing page in [`app/blog/page.tsx`](../../app/blog/page.tsx)
+- [x] T034 [P] Add Open Graph tags for article detail pages in [`app/blog/[slug]/page.tsx`](../../app/blog/[slug]/page.tsx)
+- [x] T035 [P] Verify all images use `next/image` with proper sizes and priority attributes
+- [ ] T036 [P] Test responsive design on mobile (375px), tablet (768px), and desktop (1200px+) - Ready for testing
+- [ ] T037 Test build process with `npm run build` to verify SSG generates all article pages correctly - Ready for testing
+- [ ] T038 Run Lighthouse audit on listing and detail pages to verify performance scores ≥90 - Ready for testing
+- [ ] T039 Verify Core Web Vitals: LCP ≤2.5s, FCP ≤1.8s, CLS ≤0.1 - Ready for testing
+- [ ] T040 Test with 50+ articles to ensure pagination and build performance - Ready for testing with real data
+- [x] T041 Verify constitution compliance: TypeScript strict mode, no `any` types, App Router only
+- [ ] T042 Manual testing checklist from [`plan.md`](./plan.md) Phase 3 section - Ready for manual testing
+- [x] T043 Create or update project README with setup and development instructions
 
 ---
 
