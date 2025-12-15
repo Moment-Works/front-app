@@ -70,12 +70,20 @@ X-MICROCMS-API-KEY: your-api-key
         "width": 1200,
         "height": 630
       },
-      "category": {
-        "id": "category-id",
-        "name": "Tech",
-        "createdAt": "2025-01-01T00:00:00.000Z",
-        "updatedAt": "2025-01-01T00:00:00.000Z"
-      },
+      "categories": [
+        {
+          "id": "category-id-1",
+          "name": "Tech",
+          "createdAt": "2025-01-01T00:00:00.000Z",
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        },
+        {
+          "id": "category-id-2",
+          "name": "Tutorial",
+          "createdAt": "2025-01-01T00:00:00.000Z",
+          "updatedAt": "2025-01-01T00:00:00.000Z"
+        }
+      ],
       "publishedAt": "2025-12-06T00:00:00.000Z",
       "createdAt": "2025-12-05T00:00:00.000Z",
       "updatedAt": "2025-12-06T00:00:00.000Z",
@@ -136,12 +144,20 @@ X-MICROCMS-API-KEY: your-api-key
     "width": 1200,
     "height": 630
   },
-  "category": {
-    "id": "category-id",
-    "name": "Tech",
-    "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2025-01-01T00:00:00.000Z"
-  },
+  "categories": [
+    {
+      "id": "category-id-1",
+      "name": "Tech",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "category-id-2",
+      "name": "Tutorial",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
   "publishedAt": "2025-12-06T00:00:00.000Z",
   "createdAt": "2025-12-05T00:00:00.000Z",
   "updatedAt": "2025-12-06T00:00:00.000Z",
@@ -226,12 +242,12 @@ interface MicroCMSBlog {
     width: number;
     height: number;
   };
-  category?: {                   // Optional category relation
+  categories?: Array<{           // Optional categories relationList
     id: string;
     name: string;
     createdAt: string;           // ISO 8601
     updatedAt: string;           // ISO 8601
-  };
+  }>;
   publishedAt?: string;          // ISO 8601 (optional, may be null for drafts)
   createdAt: string;             // ISO 8601
   updatedAt: string;             // ISO 8601
@@ -347,7 +363,7 @@ Request only needed fields to reduce response size:
 const { contents } = await client.getList({
   endpoint: 'blogs',
   queries: {
-    fields: 'id,title,eyecatch,category,publishedAt',
+    fields: 'id,title,eyecatch,categories,publishedAt',
     limit: 1000
   }
 });
@@ -432,12 +448,20 @@ export const mockBlog: MicroCMSBlog = {
     width: 1200,
     height: 630
   },
-  category: {
-    id: 'tech',
-    name: 'Technology',
-    createdAt: '2025-01-01T00:00:00.000Z',
-    updatedAt: '2025-01-01T00:00:00.000Z'
-  },
+  categories: [
+    {
+      id: 'tech',
+      name: 'Technology',
+      createdAt: '2025-01-01T00:00:00.000Z',
+      updatedAt: '2025-01-01T00:00:00.000Z'
+    },
+    {
+      id: 'tutorial',
+      name: 'Tutorial',
+      createdAt: '2025-01-01T00:00:00.000Z',
+      updatedAt: '2025-01-01T00:00:00.000Z'
+    }
+  ],
   publishedAt: '2025-12-06T00:00:00.000Z',
   createdAt: '2025-12-05T00:00:00.000Z',
   updatedAt: '2025-12-06T00:00:00.000Z',
@@ -461,12 +485,12 @@ const MicroCMSBlogSchema = z.object({
     width: z.number(),
     height: z.number()
   }).optional(),
-  category: z.object({
+  categories: z.array(z.object({
     id: z.string(),
     name: z.string(),
     createdAt: z.string(),
     updatedAt: z.string()
-  }).optional(),
+  })).optional(),
   publishedAt: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),

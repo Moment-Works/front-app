@@ -28,10 +28,12 @@ export function BlogListingClient({
     null
   );
 
-  // Filter articles by selected category
+  // Filter articles by selected category (match if article has the selected category)
   const filteredArticles = useMemo(() => {
     if (!selectedCategoryId) return articles;
-    return articles.filter((a) => a.categoryName === selectedCategoryId);
+    return articles.filter((a) =>
+      a.categoryNames?.includes(selectedCategoryId)
+    );
   }, [articles, selectedCategoryId]);
 
   // Paginate filtered articles

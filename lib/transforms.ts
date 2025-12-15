@@ -37,7 +37,7 @@ export function transformToListItem(blog: MicroCMSBlog): ArticleListItem {
     title: blog.title,
     excerpt: extractExcerpt(blog.content, 150),
     eyecatchUrl: blog.eyecatch?.url,
-    categoryName: blog.category?.name,
+    categoryNames: blog.categories?.map((cat) => cat.name) || [],
     publishedAt: blog.publishedAt || blog.createdAt,
   };
 }
@@ -61,7 +61,7 @@ export function transformToArticleDetail(
     title: blog.title,
     content: processedContent,
     eyecatch: blog.eyecatch,
-    categoryName: blog.category?.name,
+    categoryNames: blog.categories?.map((cat) => cat.name) || [],
     publishedAt: blog.publishedAt || blog.createdAt,
     tableOfContents: toc,
     navigation,

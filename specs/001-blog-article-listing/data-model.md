@@ -21,14 +21,14 @@ Represents a blog post fetched from microCMS with richEditorV2 content.
 
 /**
  * Blog article from microCMS API
- * Based on schema: schema/api-blogs-20251206155310.json
+ * Based on schema: schema/api-blogs-20251215122119.json
  */
 export interface MicroCMSBlog {
   id: string;
   title: string;
   content: string; // HTML from richEditorV2
   eyecatch?: MicroCMSImage;
-  category?: MicroCMSCategory;
+  categories?: MicroCMSCategory[]; // Array of category references
   publishedAt?: string; // ISO 8601 date string
   createdAt: string;
   updatedAt: string;
@@ -45,7 +45,7 @@ export interface MicroCMSImage {
 }
 
 /**
- * Category reference from microCMS relation field
+ * Category reference from microCMS relationList field
  */
 export interface MicroCMSCategory {
   id: string;
@@ -133,7 +133,7 @@ export interface ArticleListItem {
   title: string;
   excerpt?: string; // Optional: first 150 chars of content
   eyecatchUrl?: string;
-  categoryName?: string;
+  categoryNames?: string[]; // Array of category names
   publishedAt: string; // ISO 8601
 }
 
@@ -150,7 +150,7 @@ export interface ArticleDetail {
     width: number;
     height: number;
   };
-  categoryName?: string;
+  categoryNames?: string[]; // Array of category names
   publishedAt: string;
   tableOfContents: TableOfContents;
   navigation: ArticleNavigation;
@@ -226,7 +226,7 @@ export function transformToListItem(blog: MicroCMSBlog): ArticleListItem {
     title: blog.title,
     excerpt: extractExcerpt(blog.content, 150),
     eyecatchUrl: blog.eyecatch?.url,
-    categoryName: blog.category?.name,
+    categoryNames: blog.categories?.map(cat => cat.name) || [],
     publishedAt: blog.publishedAt || blog.createdAt,
   };
 }
@@ -247,7 +247,7 @@ export function transformToArticleDetail(
     title: blog.title,
     content: processedContent,
     eyecatch: blog.eyecatch,
-    categoryName: blog.category?.name,
+    categoryNames: blog.categories?.map(cat => cat.name) || [],
     publishedAt: blog.publishedAt || blog.createdAt,
     tableOfContents: toc,
     navigation,
@@ -417,7 +417,7 @@ export function BlogListingClient({
   // Derived state (memoized)
   const filteredArticles = useMemo(() => {
     return selectedCategory
-      ? articles.filter(a => a.categoryName === selectedCategory)
+      ? articles.filter(a => a.categoryNames?.includes(selectedCategory))
       : articles;
   }, [articles, selectedCategory]);
   
@@ -492,6 +492,17 @@ export async function fetchAllArticles(): Promise<ArticleListItem[]> {
   }
 
   return validBlogs.map(transformToListItem).filter(isValidArticle);
+}
+
+/**
+ * Get all unique categories from articles
+ */
+export function extractCategories(articles: ArticleListItem[]): string[] {
+  const categorySet = new Set<string>();
+  articles.forEach(article => {
+    article.categoryNames?.forEach(name => categorySet.add(name));
+  });
+  return Array.from(categorySet).sort();
 }
 ```
 

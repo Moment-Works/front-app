@@ -102,16 +102,18 @@ export async function fetchCategoryFilters(): Promise<CategoryFilter[]> {
   const categoryMap = new Map<string, { name: string; count: number }>();
 
   articles.forEach((article) => {
-    if (article.categoryName) {
-      const existing = categoryMap.get(article.categoryName);
-      if (existing) {
-        existing.count++;
-      } else {
-        categoryMap.set(article.categoryName, {
-          name: article.categoryName,
-          count: 1,
-        });
-      }
+    if (article.categoryNames) {
+      article.categoryNames.forEach((categoryName) => {
+        const existing = categoryMap.get(categoryName);
+        if (existing) {
+          existing.count++;
+        } else {
+          categoryMap.set(categoryName, {
+            name: categoryName,
+            count: 1,
+          });
+        }
+      });
     }
   });
 

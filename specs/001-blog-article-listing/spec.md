@@ -5,7 +5,7 @@
 **Status**: Draft  
 **Input**: User description: "ブログ記事の一覧表示機能を実装。記事一覧ページ（タイトル、サムネイル、公開日、カテゴリ表示、ページネーション、カテゴリ絞り込み）と記事詳細ページ（タイトル、本文、サムネイル、公開日、カテゴリ、HTML表示、目次自動生成、前後記事リンク）"
 
-**Note**: Original request mentioned "tags" and "infinite scroll", but implementation uses single "category" per article and client-side pagination for better SSG performance.
+**Note**: Original request mentioned "tags" and "infinite scroll". Implementation uses "categories" (multiple categories per article) and client-side pagination for better SSG performance.
 
 ## User Scenarios & Testing
 
@@ -20,7 +20,7 @@ Users can view a paginated list of blog articles with essential information to d
 **Acceptance Scenarios**:
 
 1. **Given** a user visits the blog listing page, **When** the page loads, **Then** they see a list of published articles sorted by publication date (newest first)
-2. **Given** multiple articles exist, **When** viewing the list, **Then** each article displays its title, thumbnail image, publication date, and associated category
+2. **Given** multiple articles exist, **When** viewing the list, **Then** each article displays its title, thumbnail image, publication date, and associated categories
 3. **Given** an article has no thumbnail, **When** displayed in the list, **Then** a default placeholder image is shown
 4. **Given** more than 10 articles exist, **When** the user navigates to page 2, **Then** the next batch of articles is displayed (client-side pagination)
 
@@ -36,7 +36,7 @@ Users can read full article content with proper formatting and navigation contex
 
 **Acceptance Scenarios**:
 
-1. **Given** a user clicks an article from the list, **When** the detail page loads, **Then** they see the full article with title, thumbnail, publication date, category, and formatted content
+1. **Given** a user clicks an article from the list, **When** the detail page loads, **Then** they see the full article with title, thumbnail, publication date, categories, and formatted content
 2. **Given** article content is in HTML format (richEditorV2), **When** displayed, **Then** it renders with proper formatting (headings, lists, links, code blocks, etc.)
 3. **Given** an article has multiple headings, **When** the detail page loads, **Then** a table of contents is automatically generated from the headings
 4. **Given** a user is viewing an article, **When** they scroll through the content, **Then** the current section is highlighted in the table of contents
@@ -46,7 +46,7 @@ Users can read full article content with proper formatting and navigation contex
 
 ### User Story 3 - Category-based Filtering (Priority: P2)
 
-Users can filter articles by selecting a specific category to find related content.
+Users can filter articles by selecting specific categories to find related content.
 
 **Why this priority**: Enhances discoverability and user experience but the blog is still functional without it. This can be added after the core viewing functionality is stable.
 
@@ -54,9 +54,9 @@ Users can filter articles by selecting a specific category to find related conte
 
 **Acceptance Scenarios**:
 
-1. **Given** a user is on the blog listing page, **When** they click on a category filter, **Then** the list filters to show only articles with that category
+1. **Given** a user is on the blog listing page, **When** they click on a category filter, **Then** the list filters to show only articles with that category (matching any of the article's categories)
 2. **Given** a category filter is active, **When** displayed, **Then** the active category is visually highlighted and a "clear filter" option is available
-3. **Given** a user selects a different category, **When** filtering, **Then** the list updates to show articles in the newly selected category
+3. **Given** a user selects a different category, **When** filtering, **Then** the list updates to show articles containing the newly selected category
 4. **Given** a category filter is active, **When** the user clears the filter, **Then** all articles are displayed again
 5. **Given** a user applies a category filter, **When** paginating, **Then** pagination continues to show only filtered articles
 
@@ -80,7 +80,7 @@ Users can quickly navigate to specific sections within long articles using an in
 
 ### Edge Cases
 
-- What happens when an article has no category? Display without category badge
+- What happens when an article has no categories? Display without category badges
 - What happens when there are no articles to display? Show an empty state message
 - What happens when user reaches the last page of articles? Disable "next" button and show "End of articles" message
 - How does the system handle articles with extremely long titles? Truncate with ellipsis after 2 lines
@@ -98,11 +98,11 @@ Users can quickly navigate to specific sections within long articles using an in
 #### Article Listing Page
 
 - **FR-001**: System MUST display a list of published blog articles ordered by publication date (newest first)
-- **FR-002**: System MUST display for each article: title, thumbnail image, publication date, and category
+- **FR-002**: System MUST display for each article: title, thumbnail image, publication date, and categories
 - **FR-003**: System MUST implement client-side pagination displaying 10 articles per page
 - **FR-004**: System MUST provide pagination controls (page numbers, previous/next buttons)
 - **FR-005**: System MUST display a default placeholder image for articles without thumbnails
-- **FR-006**: System MUST implement category filtering allowing users to filter articles by category
+- **FR-006**: System MUST implement category filtering allowing users to filter articles by one or more categories
 - **FR-007**: System MUST visually indicate active category filter with clear removal option
 - **FR-008**: System MUST maintain filter state during pagination navigation
 - **FR-009**: System MUST display an empty state message when no articles match current filters
@@ -110,7 +110,7 @@ Users can quickly navigate to specific sections within long articles using an in
 
 #### Article Detail Page
 
-- **FR-011**: System MUST display full article content including title, thumbnail, publication date, category, and body
+- **FR-011**: System MUST display full article content including title, thumbnail, publication date, categories, and body
 - **FR-012**: System MUST render richEditorV2 HTML content with proper formatting
 - **FR-013**: System relies on microCMS richEditorV2 sanitization (trusted single-author environment)
 - **FR-014**: System MUST auto-generate a table of contents from article headings (H1-H3)
@@ -153,7 +153,7 @@ Users can quickly navigate to specific sections within long articles using an in
   - Body content (required, HTML format from richEditorV2)
   - Thumbnail image URL (optional, from microCMS media - called "eyecatch")
   - Publication date (required, ISO 8601 format; falls back to createdAt if not set)
-  - Category (single category object, 0-1 per article)
+  - Categories (array of category objects, 0 or more per article)
   - Status (published only - drafts filtered at build time)
   - Author information (if provided by microCMS)
   - Created/updated timestamps from microCMS
@@ -278,7 +278,7 @@ The original request mentioned infinite scroll, but client-side pagination was c
 
 1. ✅ **Article Status**: Only published articles (drafts filtered at build time from microCMS)
 2. ✅ **Content Format**: richEditorV2 HTML (not Markdown) to match existing microCMS schema
-3. ✅ **Categorization**: Single category per article (not multiple tags) per microCMS schema
+3. ✅ **Categorization**: Multiple categories per article (relationList) per microCMS schema
 4. ✅ **Table of Contents**: Sticky/fixed positioning while scrolling, extracted from HTML headings
 5. ✅ **Data Source**: microCMS headless CMS with SSG approach
 6. ✅ **Pagination Strategy**: Client-side pagination (changed from infinite scroll) for optimal SSG performance

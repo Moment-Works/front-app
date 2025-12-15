@@ -28,7 +28,7 @@ export interface ArticleListItem {
   title: string;
   excerpt?: string; // Optional: first 150 chars of content
   eyecatchUrl?: string;
-  categoryName?: string;
+  categoryNames?: string[]; // Array of category names
   publishedAt: string; // ISO 8601
 }
 
@@ -42,7 +42,7 @@ export interface ArticleDetail {
     width: number;
     height: number;
   };
-  categoryName?: string;
+  categoryNames?: string[]; // Array of category names
   publishedAt: string;
   tableOfContents: TableOfContents;
   navigation: ArticleNavigation;

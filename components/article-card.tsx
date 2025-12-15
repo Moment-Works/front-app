@@ -54,9 +54,13 @@ export function ArticleCard({ article }: ArticleCardProps) {
             </p>
           )}
 
-          {article.categoryName && (
-            <div className='mt-auto'>
-              <Badge variant='secondary'>{article.categoryName}</Badge>
+          {article.categoryNames && article.categoryNames.length > 0 && (
+            <div className='mt-auto flex gap-2 flex-wrap'>
+              {article.categoryNames.map((categoryName) => (
+                <Badge key={categoryName} variant='secondary'>
+                  {categoryName}
+                </Badge>
+              ))}
             </div>
           )}
         </CardContent>
