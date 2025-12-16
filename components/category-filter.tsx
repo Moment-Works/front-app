@@ -12,12 +12,14 @@ interface CategoryFilterProps {
   categories: CategoryFilter[];
   selectedCategoryId: string | null;
   onSelectCategory: (categoryId: string | null) => void;
+  disabled?: boolean;
 }
 
 export function CategoryFilter({
   categories,
   selectedCategoryId,
   onSelectCategory,
+  disabled = false,
 }: CategoryFilterProps) {
   // Don't render if no categories
   if (categories.length === 0) {
@@ -34,6 +36,7 @@ export function CategoryFilter({
           variant={selectedCategoryId === null ? 'default' : 'outline'}
           onClick={() => onSelectCategory(null)}
           size='sm'
+          disabled={disabled}
         >
           All Articles
         </Button>
@@ -44,6 +47,7 @@ export function CategoryFilter({
             variant={selectedCategoryId === category.id ? 'default' : 'outline'}
             onClick={() => onSelectCategory(category.id)}
             size='sm'
+            disabled={disabled}
           >
             {category.name}{' '}
             <span className='ml-1 text-xs'>({category.count})</span>

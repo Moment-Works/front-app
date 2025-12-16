@@ -37,8 +37,8 @@ Implement "View More" button with incremental loading (6 posts per click) instea
 const [visibleCount, setVisibleCount] = useState(6);
 const [isLoading, setIsLoading] = useState(false);
 
-// Load more handler
-const handleLoadMore = () => {
+// View More handler
+const handleViewMore = () => {
   setIsLoading(true);
   // Increment visible count by 6
   setVisibleCount(prev => prev + 6);

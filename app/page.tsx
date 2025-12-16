@@ -1,65 +1,93 @@
-import Image from "next/image";
+/**
+ * Top page (Server Component)
+ * Main entry point with blog listing and navigation
+ */
 
-export default function Home() {
+import { fetchAllArticles, fetchCategoryFilters } from '@/lib/microcms';
+import { MobileNavigation } from '@/components/mobile-navigation';
+import { TopPageListingClient } from '@/components/top-page-listing-client';
+import { Button } from '@/components/ui/button';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Moment Works - Latest Articles',
+  description:
+    'Explore our latest blog articles covering technology, design, and development insights. Stay updated with our newest content.',
+  openGraph: {
+    title: 'Moment Works - Latest Articles',
+    description:
+      'Explore our latest blog articles covering technology, design, and development insights',
+    type: 'website',
+    url: 'https://momentworks.com',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Moment Works - Latest Articles',
+    description:
+      'Explore our latest blog articles covering technology, design, and development insights',
+  },
+};
+
+// Note: Open Graph image is auto-handled by app/opengraph-image.png
+
+export default async function HomePage() {
+  // Fetch data server-side (T006)
+  let articles, categories;
+
+  try {
+    [articles, categories] = await Promise.all([
+      fetchAllArticles(),
+      fetchCategoryFilters(),
+    ]);
+  } catch (error) {
+    // Error handling (T008)
+    console.error('Failed to fetch blog content:', error);
+    return (
+      <div className='min-h-screen flex flex-col'>
+        <MobileNavigation />
+        <main className='flex-1 container mx-auto px-4 py-12 text-center'>
+          <h1 className='text-2xl font-bold mb-4'>Unable to load articles</h1>
+          <p className='text-muted-foreground mb-6'>
+            There was a problem loading the blog content. Please try again
+            later.
+          </p>
+          <form>
+            <Button type='submit' size='lg'>
+              Retry
+            </Button>
+          </form>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className='min-h-screen flex flex-col'>
+      {/* Navigation (T007) */}
+      <MobileNavigation />
+
+      {/* Main Content */}
+      <main className='flex-1 container mx-auto px-4 py-8'>
+        {/* Hero Section */}
+        <div className='mb-12'>
+          <h1 className='text-4xl md:text-5xl font-bold mb-4'>
+            Latest Articles
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className='text-xl text-muted-foreground'>
+            Explore our insights on technology, design, and development
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {/* Blog Listing */}
+        <TopPageListingClient articles={articles} categories={categories} />
       </main>
+
+      {/* Footer */}
+      <footer className='border-t py-6 mt-12'>
+        <div className='container mx-auto px-4 text-center text-sm text-muted-foreground'>
+          © 2025 Moment Works. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }

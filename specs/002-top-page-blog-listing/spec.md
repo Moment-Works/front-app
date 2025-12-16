@@ -110,13 +110,13 @@ The top page serves as the main entry point for the website, displaying a compre
   - "View More" button appears if more posts available in that category
   - "View More" loads additional posts from the selected category only (maintains filter state)
   - If user had loaded more posts before filtering (e.g., 12 posts visible), applying a filter resets to initial 6 posts of the selected category
-- When a category has no posts, display friendly empty state message (e.g., "No posts in this category yet. Check back soon!") with simple icon
+- When a category has no posts, display friendly empty state message (e.g., "No posts in this category yet. Check back soon!") with lucide-react FileQuestion icon (24x24)
 - Category filter uses the existing [`CategoryFilter`](../../components/category-filter.tsx) component
 
 ### FR3: Mobile Navigation Menu
 
-- Mobile menu control appears on screens below 1024px width (mobile/tablet breakpoint)
-- Applies to both mobile phones (< 768px) and tablets (768px - 1024px)
+- Mobile menu control appears on screens with width < 1024px (mobile/tablet breakpoint)
+- Applies to both mobile phones (< 768px) and tablets (768px - 1023px)
 - Menu contains navigation links:
   - Home (links to `/`)
   - Blog (links to `/blog`)
@@ -147,10 +147,14 @@ The top page serves as the main entry point for the website, displaying a compre
 - Reuse existing data fetching from [`lib/microcms.ts`](../../lib/microcms.ts)
   - [`fetchAllArticles()`](../../lib/microcms.ts:32)
   - [`fetchCategoryFilters()`](../../lib/microcms.ts:100)
-- Reuse existing components:
-  - [`BlogListingClient`](../../components/blog-listing-client.tsx:22) (adapt for "View More" pattern instead of pagination)
+- Create new [`TopPageListingClient`](../../components/top-page-listing-client.tsx) component adapted from existing [`BlogListingClient`](../../components/blog-listing-client.tsx:22) pattern
+  - Implements "View More" incremental loading pattern (instead of pagination)
+  - Manages category filtering with URL query parameters
+  - Maintains same visual design and user experience
+- Reuse existing components without modification:
   - [`ArticleGrid`](../../components/article-grid.tsx:14)
-  - [`CategoryFilter`](../../components/category-filter.tsx:17)
+  - [`CategoryFilter`](../../components/category-filter.tsx:17) (add `disabled` prop only)
+  - [`ArticleCard`](../../components/article-card.tsx:23)
 
 ### FR7: Error Handling
 
@@ -169,7 +173,7 @@ The top page serves as the main entry point for the website, displaying a compre
 
 - When a selected category contains no blog posts:
   - Display friendly message: "No posts in this category yet. Check back soon!"
-  - Include simple icon or illustration for visual feedback
+  - Include lucide-react FileQuestion icon (size: 24x24, className: 'text-muted-foreground') for visual feedback
   - Maintain page structure and navigation
   - Category filter remains functional
 - When initial page load returns no posts at all (edge case):
@@ -179,22 +183,24 @@ The top page serves as the main entry point for the website, displaying a compre
 ### FR9: SEO & Metadata
 
 - Top page must include comprehensive SEO meta
-  - **Page Title**: Descriptive site title (e.g., "Blog - [Site Name]" or "[Site Name] - Latest Articles")
-  - **Meta Description**: Concise description of blog content (150-160 characters)
+  - **Site Name**: "Moment Works"
+  - **Page Title**: "Moment Works - Latest Articles"
+  - **Meta Description**: "Explore our latest blog articles covering technology, design, and development insights. Stay updated with our newest content." (150-160 characters)
   - **Open Graph Tags**: For social media sharing
-    - `og:title`: Page title
-    - `og:description`: Page description
-    - `og:image`: Default site image or hero image
+    - `og:title`: "Moment Works - Latest Articles"
+    - `og:description`: "Explore our latest blog articles covering technology, design, and development insights"
+    - `og:image`: Auto-generated from `app/opengraph-image.png` (1200x630px, already exists)
     - `og:type`: "website"
-    - `og:url`: Canonical URL
+    - `og:url`: Canonical URL (e.g., `https://momentworks.com`)
   - **Twitter Card Tags**: For Twitter/X sharing
     - `twitter:card`: "summary_large_image"
-    - `twitter:title`: Page title
-    - `twitter:description`: Page description
-    - `twitter:image`: Default site image
+    - `twitter:title`: "Moment Works - Latest Articles"
+    - `twitter:description`: "Explore our latest blog articles covering technology, design, and development insights"
+    - `twitter:image`: Auto-generated from `app/opengraph-image.png`
   - **Canonical URL**: Self-referencing canonical tag to avoid duplicate content
-- When category filter is active, update meta description to reflect filtered content
+- When category filter is active, update meta description to reflect filtered content (e.g., "Browse Technology articles on Moment Works")
 - Use Next.js App Router metadata API for implementation
+- Note: Next.js automatically handles `opengraph-image.png` file in app directory
 
 ---
 
@@ -202,10 +208,10 @@ The top page serves as the main entry point for the website, displaying a compre
 
 ### Measurable Outcomes
 
-1. **Page Load Performance**: Top page loads and displays initial 6 blog posts within 2 seconds on standard broadband connection
+1. **Page Load Performance**: Top page loads and displays initial 6 blog posts within 2 seconds when tested with Lighthouse using Fast 3G simulation (4x CPU slowdown, 1.6 Mbps download, 150ms RTT)
 2. **Category Filter Responsiveness**: Filtering updates the blog list within 200ms of user interaction
 3. **View More Performance**: Loading additional 6 posts takes less than 500ms
-4. **Mobile Menu Usability**: Mobile navigation menu opens/closes within 300ms with smooth transition
+4. **Mobile Menu Usability**: Mobile navigation menu opens/closes within 300ms with smooth transition using ease-in-out easing (cubic-bezier(0.4, 0, 0.2, 1))
 5. **Cross-Device Compatibility**: Layout renders correctly on mobile (320px+), tablet (768px+), and desktop (1024px+) screens
 6. **Navigation Accessibility**: All navigation links and buttons are keyboard-accessible and screen-reader friendly
 
@@ -248,7 +254,7 @@ The top page serves as the main entry point for the website, displaying a compre
 ## Assumptions
 
 1. **Existing Blog Infrastructure**: The project already has a working blog system at `/blog` with microCMS integration
-2. **Component Reusability**: Existing blog components ([`BlogListingClient`](../../components/blog-listing-client.tsx), [`ArticleGrid`](../../components/article-grid.tsx), [`CategoryFilter`](../../components/category-filter.tsx)) can be reused without modification
+2. **Component Reusability**: Existing blog components ([`ArticleGrid`](../../components/article-grid.tsx), [`CategoryFilter`](../../components/category-filter.tsx), [`ArticleCard`](../../components/article-card.tsx)) can be reused; new [`TopPageListingClient`](../../components/top-page-listing-client.tsx) will be created following the same patterns as existing [`BlogListingClient`](../../components/blog-listing-client.tsx)
 3. **Navigation Placeholders**: About and Contact pages will be implemented later; links can point to placeholder routes
 4. **Styling Framework**: Project uses Tailwind CSS and shadcn/ui components (based on existing [`components/ui/`](../../components/ui/) directory)
 5. **Responsive Breakpoints**: Mobile menu breakpoint at 1024px (lg:); navigation switches to horizontal at ≥1024px
@@ -297,20 +303,21 @@ The top page serves as the main entry point for the website, displaying a compre
 
 ```
 app/page.tsx (Server Component)
-  ├─ Header/Navigation Component (Client Component)
-  │   └─ MobileMenu Component (Client Component for < 1024px)
-  └─ BlogListingClient (Client Component - adapted for View More pattern)
-      ├─ CategoryFilter (Client Component - existing)
-      ├─ ArticleGrid (Client Component - existing)
-      │   └─ ArticleCard (existing)
-      └─ ViewMoreButton (Client Component - new or adapted)
+  ├─ MobileNavigation Component (Client Component)
+  │   └─ Sheet (shadcn/ui - collapsible menu for < 1024px)
+  └─ TopPageListingClient (Client Component - new, based on BlogListingClient pattern)
+      ├─ CategoryFilter (Client Component - existing, add disabled prop)
+      ├─ ArticleGrid (Client Component - existing, no changes)
+      │   └─ ArticleCard (Client Component - existing, no changes)
+      └─ ViewMoreButton (Client Component - new)
 ```
 
 ### State Management
 
-- Navigation menu open/closed state managed in client component
-- Category filter state managed in existing [`BlogListingClient`](../../components/blog-listing-client.tsx:26-29)
-- Post display count state managed in [`BlogListingClient`](../../components/blog-listing-client.tsx) (initial: 6, increment: 6)
+- Navigation menu open/closed state managed by shadcn/ui Sheet component
+- Category filter state managed in new [`TopPageListingClient`](../../components/top-page-listing-client.tsx) component
+- Post display count state managed in [`TopPageListingClient`](../../components/top-page-listing-client.tsx) (initial: 6, increment: 6)
+- URL query parameters used for shareable category filter state
 - No global state management needed
 
 ### Responsive Design Strategy

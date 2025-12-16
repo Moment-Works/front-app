@@ -256,7 +256,7 @@ describe('MobileNavigation', () => {
 
 ```typescript
 interface ViewMoreButtonProps {
-  onClick: () => void;        // Handler for load more action
+  onClick: () => void;        // Handler for View More action
   isLoading: boolean;         // Loading state
   hasMore: boolean;           // Whether more articles available
   loadedCount: number;        // Number currently displayed
@@ -401,7 +401,7 @@ export default async function HomePage() {
 ### Metadata
 
 ```typescript
-export const meta Metadata = {
+export const metadata: Metadata = {
   title: 'Moment Works - Latest Articles',
   description: 'Explore our latest blog articles covering technology, design, and development insights',
   openGraph: {
@@ -409,15 +409,15 @@ export const meta Metadata = {
     description: 'Explore our latest blog articles',
     type: 'website',
     url: 'https://momentworks.com',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Moment Works - Latest Articles',
     description: 'Explore our latest blog articles',
-    images: ['/og-image.png'],
   },
 };
+
+// Note: Open Graph image auto-handled by app/opengraph-image.png
 ```
 
 ### Error Handling
@@ -428,7 +428,17 @@ try {
   const articles = await fetchAllArticles();
 } catch (error) {
   console.error('Failed to fetch articles:', error);
-  return <ErrorState message="Unable to load articles" />;
+  return (
+    <div className="text-center py-12">
+      <h1 className="text-2xl font-bold mb-4">Unable to load articles</h1>
+      <p className="text-muted-foreground mb-6">
+        There was a problem loading the blog content. Please try again later.
+      </p>
+      <form>
+        <Button type="submit" size="lg">Retry</Button>
+      </form>
+    </div>
+  );
 }
 ```
 

@@ -438,9 +438,10 @@ Implement the root route with Server Component data fetching.
 import { fetchAllArticles, fetchCategoryFilters } from '@/lib/microcms';
 import { MobileNavigation } from '@/components/mobile-navigation';
 import { TopPageListingClient } from '@/components/top-page-listing-client';
+import { Button } from '@/components/ui/button';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
+export const meta Metadata = {
   title: 'Moment Works - Latest Articles',
   description:
     'Explore our latest blog articles covering technology, design, and development insights. Stay updated with our newest content.',
@@ -450,23 +451,16 @@ export const metadata: Metadata = {
       'Explore our latest blog articles covering technology, design, and development insights',
     type: 'website',
     url: 'https://momentworks.com',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Moment Works',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Moment Works - Latest Articles',
     description:
       'Explore our latest blog articles covering technology, design, and development insights',
-    images: ['/og-image.png'],
   },
 };
+
+// Note: Open Graph image is auto-handled by app/opengraph-image.png
 
 export default async function HomePage() {
   // Fetch data server-side
@@ -487,12 +481,11 @@ export default async function HomePage() {
           <p className="text-muted-foreground mb-6">
             There was a problem loading the blog content. Please try again later.
           </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-          >
-            Retry
-          </button>
+          <form>
+            <Button type="submit" size="lg">
+              Retry
+            </Button>
+          </form>
         </main>
       </div>
     );
@@ -558,7 +551,7 @@ Ensure shadcn/ui Sheet component is available.
 ls components/ui/sheet.tsx
 
 # If not exists, install it
-npx shadcn-ui@latest add sheet
+npx shadcn@latest add sheet
 ```
 
 **Verification**: Check that [`components/ui/sheet.tsx`](../../../components/ui/sheet.tsx) exists.
@@ -750,7 +743,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 **Solution**: Check Sheet component is installed:
 
 ```bash
-npx shadcn-ui@latest add sheet
+npx shadcn@latest add sheet
 ```
 
 ### Issue: Articles not filtering by category
@@ -826,7 +819,7 @@ Before deploying to production:
 - [ ] All tests passing
 - [ ] Lighthouse audit meets targets (≥90 performance)
 - [ ] SEO metadata configured correctly
-- [ ] Open Graph image exists at `/public/og-image.png`
+- [ ] Open Graph image exists at `app/opengraph-image.png` (✅ already present)
 - [ ] Environment variables set in production:
   - `MICROCMS_SERVICE_DOMAIN`
   - `MICROCMS_API_KEY`
