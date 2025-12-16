@@ -3,6 +3,7 @@
  * Main entry point with blog listing and navigation
  */
 
+import { Suspense } from 'react';
 import { fetchAllArticles, fetchCategoryFilters } from '@/lib/microcms';
 import { MobileNavigation } from '@/components/mobile-navigation';
 import { TopPageListingClient } from '@/components/top-page-listing-client';
@@ -10,6 +11,9 @@ import { Button } from '@/components/ui/button';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+  ),
   title: 'Moment Works - Latest Articles',
   description:
     'Explore our latest blog articles covering technology, design, and development insights. Stay updated with our newest content.',
@@ -78,8 +82,16 @@ export default async function HomePage() {
           </p>
         </div>
 
-        {/* Blog Listing */}
-        <TopPageListingClient articles={articles} categories={categories} />
+        {/* Blog Listing - Wrapped in Suspense for useSearchParams */}
+        <Suspense
+          fallback={
+            <div className='text-center py-12'>
+              <p className='text-muted-foreground'>Loading articles...</p>
+            </div>
+          }
+        >
+          <TopPageListingClient articles={articles} categories={categories} />
+        </Suspense>
       </main>
 
       {/* Footer */}
