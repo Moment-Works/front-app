@@ -29,8 +29,9 @@ The top page serves as the main entry point for the website, displaying a compre
 
 - **Given**: User arrives at the top page
 - **When**: The page loads
-- **Then**: User sees all blog posts listed in reverse chronological order (newest first)
-- **And**: Posts display title, excerpt, publish date, and associated categories
+- **Then**: User sees initial 6 blog posts listed in reverse chronological order (newest first)
+- **And**: Posts display title, excerpt, publish date, eye-catch image, and associated categories
+- **And**: "View More" button appears if more than 6 posts are available
 
 **Scenario 2: Filtering by Category**
 
@@ -40,13 +41,22 @@ The top page serves as the main entry point for the website, displaying a compre
 - **And**: The selected category is visually highlighted
 - **And**: User can see how many posts belong to each category
 
-**Scenario 3: Resetting Category Filter**
+**Scenario 3: Loading More Posts**
+
+- **Given**: User is viewing the initial 6 blog posts
+- **When**: User clicks the "View More" button
+- **Then**: 6 additional posts are loaded and displayed below existing posts
+- **And**: "View More" button remains visible if more posts are available
+- **And**: "View More" button disappears when all posts are displayed
+
+**Scenario 4: Resetting Category Filter**
 
 - **Given**: User has a category filter applied
 - **When**: User clicks "All Articles" or deselects the current category
-- **Then**: The full list of blog posts is displayed again
+- **Then**: The list resets to initial 6 blog posts (unfiltered)
+- **And**: "View More" button appears if more posts are available
 
-**Scenario 4: Using Mobile Navigation Menu**
+**Scenario 5: Using Mobile Navigation Menu**
 
 - **Given**: User accesses the site on a mobile device
 - **When**: User taps the menu trigger control
@@ -54,7 +64,7 @@ The top page serves as the main entry point for the website, displaying a compre
 - **And**: Menu displays links to Home, Blog, About, and Contact pages
 - **And**: User can close the menu by tapping the control again or selecting a link
 
-**Scenario 5: Desktop Navigation**
+**Scenario 6: Desktop Navigation**
 
 - **Given**: User accesses the site on a desktop device
 - **When**: The page loads
@@ -67,43 +77,59 @@ The top page serves as the main entry point for the website, displaying a compre
 
 ### FR1: Blog Post Display
 
-- Display all blog posts on the top page
+- Display initial 6 blog posts on the top page
+- Show "View More" button to load additional 6 posts incrementally
+- Button disappears when all posts are displayed
+- During loading, show loading spinner on the "View More" button while keeping existing posts visible
+- Button must be disabled during loading to prevent duplicate requests and race conditions
 - Each post must show:
   - Title (clickable link to full article)
   - Excerpt or preview text
   - Publish date
   - Category badges/tags
-  - Author information (if available)
+  - Eye-catch image (if available)
 - Posts must be ordered by publish date, newest first
 - Use existing blog listing components from `/app/blog/page.tsx`
+- Follow existing [`ArticleCard`](../../components/article-card.tsx:23) component specification (no author display)
 
 ### FR2: Category Filtering
 
 - Display all available categories as filter buttons
 - Show post count for each category (e.g., "Technology (5)")
 - Include an "All Articles" option to show unfiltered results
-- No category should be selected by default
+- No category should be selected by default (unless URL contains category query parameter)
 - When a category is selected:
   - Only posts in that category are displayed
   - The selected category button is visually highlighted
-  - Pagination resets to page 1
+  - Show loading spinner on button during category filter change
+  - All category filter buttons must be disabled during loading to prevent conflicting filter requests
+  - URL updates with query parameter (e.g., `/?category=technology`) for shareable links
+  - Browser back/forward navigation works correctly with category state
+  - When category changes via browser back/forward navigation, page scrolls to top of blog listing to ensure user sees the newly filtered content
+  - Post count resets to initial 6 posts (discards any previously loaded posts)
+  - "View More" button appears if more posts available in that category
+  - "View More" loads additional posts from the selected category only (maintains filter state)
+  - If user had loaded more posts before filtering (e.g., 12 posts visible), applying a filter resets to initial 6 posts of the selected category
+- When a category has no posts, display friendly empty state message (e.g., "No posts in this category yet. Check back soon!") with simple icon
 - Category filter uses the existing [`CategoryFilter`](../../components/category-filter.tsx) component
 
 ### FR3: Mobile Navigation Menu
 
-- Mobile menu control appears on screens below 768px width (mobile/tablet breakpoint)
+- Mobile menu control appears on screens below 1024px width (mobile/tablet breakpoint)
+- Applies to both mobile phones (< 768px) and tablets (768px - 1024px)
 - Menu contains navigation links:
   - Home (links to `/`)
   - Blog (links to `/blog`)
   - About (links to `/about` - placeholder for future implementation)
   - Contact (links to `/contact` - placeholder for future implementation)
 - Menu can be opened and closed by clicking/tapping the control
-- When menu is open, clicking a link navigates to that page and closes the menu
+- When menu is open, clicking a link navigates to that page and automatically closes the menu
+- Menu state does not persist across page navigation (always starts closed on new page load)
 - Smooth open/close transition for better user experience
 
 ### FR4: Desktop Navigation
 
-- On screens 768px and wider, display navigation links horizontally in the header
+- On screens 1024px and wider, display navigation links horizontally in the header
 - No mobile menu control shown on desktop
 - Links remain accessible and properly styled for hover states
 
@@ -111,8 +137,8 @@ The top page serves as the main entry point for the website, displaying a compre
 
 - Layout adapts to different screen sizes:
   - Mobile (< 768px): Single column, collapsible menu
-  - Tablet (768px - 1024px): Two-column grid, collapsible menu or horizontal nav
-  - Desktop (> 1024px): Three-column grid, horizontal navigation
+  - Tablet (768px - 1024px): Two-column grid, collapsible menu
+  - Desktop (≥ 1024px): Three-column grid, horizontal navigation
 - Category filters wrap appropriately on smaller screens
 - Blog post cards stack vertically on mobile
 
@@ -122,10 +148,53 @@ The top page serves as the main entry point for the website, displaying a compre
   - [`fetchAllArticles()`](../../lib/microcms.ts:32)
   - [`fetchCategoryFilters()`](../../lib/microcms.ts:100)
 - Reuse existing components:
-  - [`BlogListingClient`](../../components/blog-listing-client.tsx:22)
+  - [`BlogListingClient`](../../components/blog-listing-client.tsx:22) (adapt for "View More" pattern instead of pagination)
   - [`ArticleGrid`](../../components/article-grid.tsx:14)
   - [`CategoryFilter`](../../components/category-filter.tsx:17)
-  - [`Pagination`](../../components/pagination.tsx) (if exists)
+
+### FR7: Error Handling
+
+- When microCMS API requests fail (network error, API down, timeout):
+  - Display user-friendly error message indicating the issue
+  - Provide "Retry" button to re-attempt the failed request
+  - Maintain page structure and navigation functionality
+  - Log error details for debugging purposes
+- Error states should be handled for:
+  - Initial blog post fetch on page load
+  - Category filter data fetch
+  - "View More" button clicks
+- Error messages should be clear and actionable (e.g., "Unable to load blog posts. Please try again.")
+
+### FR8: Empty States
+
+- When a selected category contains no blog posts:
+  - Display friendly message: "No posts in this category yet. Check back soon!"
+  - Include simple icon or illustration for visual feedback
+  - Maintain page structure and navigation
+  - Category filter remains functional
+- When initial page load returns no posts at all (edge case):
+  - Display message: "No blog posts available. Check back soon!"
+  - Maintain navigation functionality
+
+### FR9: SEO & Metadata
+
+- Top page must include comprehensive SEO meta
+  - **Page Title**: Descriptive site title (e.g., "Blog - [Site Name]" or "[Site Name] - Latest Articles")
+  - **Meta Description**: Concise description of blog content (150-160 characters)
+  - **Open Graph Tags**: For social media sharing
+    - `og:title`: Page title
+    - `og:description`: Page description
+    - `og:image`: Default site image or hero image
+    - `og:type`: "website"
+    - `og:url`: Canonical URL
+  - **Twitter Card Tags**: For Twitter/X sharing
+    - `twitter:card`: "summary_large_image"
+    - `twitter:title`: Page title
+    - `twitter:description`: Page description
+    - `twitter:image`: Default site image
+  - **Canonical URL**: Self-referencing canonical tag to avoid duplicate content
+- When category filter is active, update meta description to reflect filtered content
+- Use Next.js App Router metadata API for implementation
 
 ---
 
@@ -133,16 +202,18 @@ The top page serves as the main entry point for the website, displaying a compre
 
 ### Measurable Outcomes
 
-1. **Page Load Performance**: Top page loads and displays blog posts within 2 seconds on standard broadband connection
+1. **Page Load Performance**: Top page loads and displays initial 6 blog posts within 2 seconds on standard broadband connection
 2. **Category Filter Responsiveness**: Filtering updates the blog list within 200ms of user interaction
-3. **Mobile Menu Usability**: Mobile navigation menu opens/closes within 300ms with smooth transition
-4. **Cross-Device Compatibility**: Layout renders correctly on mobile (320px+), tablet (768px+), and desktop (1024px+) screens
-5. **Navigation Accessibility**: All navigation links are keyboard-accessible and screen-reader friendly
+3. **View More Performance**: Loading additional 6 posts takes less than 500ms
+4. **Mobile Menu Usability**: Mobile navigation menu opens/closes within 300ms with smooth transition
+5. **Cross-Device Compatibility**: Layout renders correctly on mobile (320px+), tablet (768px+), and desktop (1024px+) screens
+6. **Navigation Accessibility**: All navigation links and buttons are keyboard-accessible and screen-reader friendly
 
 ### Qualitative Outcomes
 
 - Users can quickly browse and filter blog content without confusion
-- Category filtering provides immediate visual feedback
+- Category filtering provides immediate visual feedback and resets to initial 6 posts
+- "View More" button provides clear affordance for loading additional content
 - Mobile navigation feels intuitive and doesn't obstruct content
 - Design maintains visual consistency with existing `/blog` page
 
@@ -180,9 +251,9 @@ The top page serves as the main entry point for the website, displaying a compre
 2. **Component Reusability**: Existing blog components ([`BlogListingClient`](../../components/blog-listing-client.tsx), [`ArticleGrid`](../../components/article-grid.tsx), [`CategoryFilter`](../../components/category-filter.tsx)) can be reused without modification
 3. **Navigation Placeholders**: About and Contact pages will be implemented later; links can point to placeholder routes
 4. **Styling Framework**: Project uses Tailwind CSS and shadcn/ui components (based on existing [`components/ui/`](../../components/ui/) directory)
-5. **Responsive Breakpoints**: Standard Tailwind breakpoints (sm: 640px, md: 768px, lg: 1024px, xl: 1280px)
-6. **Default Category State**: No category filter is pre-selected, showing all articles initially
-7. **Pagination**: If existing pagination component exists, it will be reused; otherwise, will be implemented as needed
+5. **Responsive Breakpoints**: Mobile menu breakpoint at 1024px (lg:); navigation switches to horizontal at ≥1024px
+6. **Default Category State**: No category filter is pre-selected, showing initial 6 articles
+7. **View More Pattern**: Initial load shows 6 posts, each "View More" click loads 6 additional posts
 8. **Mobile-First Design**: Layout designed mobile-first, progressively enhanced for larger screens
 
 ---
@@ -227,28 +298,49 @@ The top page serves as the main entry point for the website, displaying a compre
 ```
 app/page.tsx (Server Component)
   ├─ Header/Navigation Component (Client Component)
-  │   └─ MobileMenu Component (Client Component for mobile)
-  └─ BlogListingClient (Client Component - existing)
+  │   └─ MobileMenu Component (Client Component for < 1024px)
+  └─ BlogListingClient (Client Component - adapted for View More pattern)
       ├─ CategoryFilter (Client Component - existing)
       ├─ ArticleGrid (Client Component - existing)
       │   └─ ArticleCard (existing)
-      └─ Pagination (Client Component - existing)
+      └─ ViewMoreButton (Client Component - new or adapted)
 ```
 
 ### State Management
 
 - Navigation menu open/closed state managed in client component
 - Category filter state managed in existing [`BlogListingClient`](../../components/blog-listing-client.tsx:26-29)
+- Post display count state managed in [`BlogListingClient`](../../components/blog-listing-client.tsx) (initial: 6, increment: 6)
 - No global state management needed
 
 ### Responsive Design Strategy
 
 - Use Tailwind CSS responsive utilities (`md:`, `lg:` prefixes)
-- Mobile menu control hidden on desktop using `md:hidden`
-- Desktop navigation links hidden on mobile using `hidden md:flex`
+- Mobile menu control hidden on desktop using `lg:hidden`
+- Desktop navigation links hidden on mobile/tablet using `hidden lg:flex`
 - Grid columns adjust based on breakpoint: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
 
 ---
+
+## Clarifications
+
+### Session 2025-12-15
+
+- Q: The spec mentions that blog posts display "Author information (if available)" but doesn't specify the fallback behavior when author data is missing. How should the UI handle missing author information? → A: use blog card component that already implemented. so follow existing compnent specification.
+- Q: When a user clicks on a category filter, should the URL update to reflect the selected category (e.g., `/?category=technology`) to allow direct linking and browser back/forward navigation? → A: Yes, update URL with query parameter for shareable links
+- Q: The mobile navigation menu breakpoint is specified as 768px, but tablet behavior (768px-1024px) is ambiguous. Should tablets display the mobile collapsible menu or horizontal desktop navigation? → A: Tablets use mobile collapsible menu (breakpoint at 1024px)
+- Q: Should the top page (`/`) include pagination for the blog listing, or should it display all blog posts without pagination? → A: Display limited initial posts (e.g., 6) with "View More" button
+- Q: When the user clicks "View More", how many additional posts should be loaded each time? → A: Load 6 more posts (same as initial)
+- Q: Category Filter Behavior: When filtering by category and clicking "View More", what should happen? → A: Load 6 more posts from the SELECTED category only (maintain filter)
+- Q: Error Handling: How should the application handle scenarios when the microCMS API request fails (network error, API down, timeout)? → A: Display error message with retry button
+- Q: Loading State: How should the UI indicate that content is being loaded when the user clicks "View More" or changes category filters? → A: Show loading spinner on button
+- Q: Empty State: When a selected category has no blog posts, what should be displayed to the user? → A: Show friendly message with illustration
+- Q: SEO & Meta Should the top page have specific meta tags for SEO (title, description, Open Graph tags)? → A: Yes, include SEO metadata
+- Q: When a user has already clicked "View More" to load 12 posts (initial 6 + 6 more), then applies a category filter, how should the displayed posts be handled? → A: Reset to initial 6 posts of the selected category
+- Q: Should the mobile navigation menu automatically close when the user navigates to a new page (e.g., clicks "Home" from the /blog page), or should it remain open for the new page load? → A: Close menu on navigation
+- Q: When the "View More" button is loading additional posts, should the button remain clickable (allowing multiple simultaneous requests) or be disabled until the current load completes? → A: Disable button during load
+- Q: When a category filter button is clicked and is loading the filtered posts, should other category filter buttons remain clickable or be disabled during the loading state? → A: Disable all category buttons during load
+- Q: When browser back/forward navigation changes the category filter (via URL query parameter), should the page scroll to the top of the blog listing or maintain the current scroll position? → A: Scroll to top of blog listing
 
 ## Open Questions
 
